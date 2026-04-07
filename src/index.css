@@ -1,0 +1,389 @@
+/* --- IMPORT CZCIONKI --- */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+/* --- ZMIENNE KOLORÓW (LIGHT/DARK) --- */
+:root {
+  --bg-body: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #764ba2;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme='dark'] {
+  --bg-body: #0a0a0a;
+  --bg-card: #161616;
+  --bg-input: #1f1f1f;
+  --text-main: #ffffff;
+  --text-muted: #a0a0a0;
+  --border: #262626;
+  --accent: #00ff88;
+  --nav-bg: rgba(10, 10, 10, 0.9);
+}
+
+/* --- RESET I PODSTAWY --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* --- NAWIGACJA (NAVBAR) --- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  height: 80px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 25px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* --- NAGŁÓWEK SKLEPU (HEADER) --- */
+.shop-header {
+  padding: 60px 5%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+}
+
+.shop-header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.shop-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* --- WYSZUKIWARKA --- */
+.search-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 30px 0;
+}
+
+.search-container input {
+  padding: 15px 25px;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: var(--bg-body);
+  color: var(--text-main);
+  width: 100%;
+  outline: none;
+}
+
+/* --- FILTRY (KATEGORIE, KOLOR, CENA) --- */
+.filters-panel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+  background: var(--bg-body);
+  padding: 25px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 900px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.filter-group select {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+}
+
+/* --- NAPRAWA SUWAKA CENY (RANGE) --- */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 160px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  margin: 15px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 3px solid var(--bg-card);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 3px solid var(--bg-card);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+/* --- KARTY PRODUKTÓW --- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 280px);
+  gap: 30px;
+  padding: 40px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 280px;
+  height: 480px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.product-image {
+  width: 100%;
+  height: 240px;
+  background: #000;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.add-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.02);
+}
+
+/* --- FORMULARZE I INPUTY --- */
+input:not([type="range"]) {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-main);
+  outline: none;
+  font-size: 1rem;
+}
+
+input:not([type="range"]):focus {
+  border-color: var(--accent);
+}
+
+/* --- FAQ & LOGIN CARDS --- */
+.faq-card, .login-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 25px;
+  border-radius: 15px;
+}
+
+/* --- FOOTER --- */
+.footer {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border-top: 1px solid var(--border);
+  padding: 60px 5% 20px;
+  margin-top: 80px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+}
+
+.footer-section h4 {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li a {
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: 0.2s;
+}
+
+.footer-section ul li a:hover {
+  color: var(--accent);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+/* --- ELEGANCKI SELEKTOR ILOŚCI --- */
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--bg-input);
+  padding: 5px 10px;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.qty-btn:hover {
+  background: var(--accent);
+  color: #000;
+  transform: scale(1.1);
+}
+
+.qty-btn:active {
+  transform: scale(0.9);
+}
+
+.qty-number {
+  font-weight: 800;
+  font-size: 1.1rem;
+  min-width: 25px;
+  text-align: center;
+  color: var(--text-main);
+}
+
+/* Dodatkowa poprawka dla wiersza w koszyku, żeby wszystko było w linii */
+.cart-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.remove-btn {
+  color: #ff4757;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  transition: opacity 0.2s;
+}
+
+.remove-btn:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
