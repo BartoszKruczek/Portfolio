@@ -2,145 +2,77 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 
-// Komponenty
+// FIREBASE
+import { auth, db } from './firebase';
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { collection, addDoc, onSnapshot, query, where } from "firebase/firestore";
+
+// KOMPONENTY I STRONY
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-
-// Strony
 import Home from './pages/Home';
 import Cart from './pages/Cart';
 import ProductDetails from './pages/ProductDetails';
 import About from './pages/About';
 import Login from './pages/Login';
+import Checkout from './pages/Checkout';
 
 function App() {
-  // --- STAN: TRYB JASNY / CIEMNY ---
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light';
-  });
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [user, setUser] = useState(null);
+  const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('myCart')) || []);
+  const [orders, setOrders] = useState([]);
+  const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem('userFavs')) || []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const q = query(collection(db, "orders"), where("userEmail", "==", user.email));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const ordersList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setOrders(ordersList);
+      });
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
-
-  // --- STAN: UŻYTKOWNIK ---
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('loggedUser');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('loggedUser', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('loggedUser');
-    }
-  }, [user]);
-
-  const handleLogout = () => {
-    setUser(null);
-    toast("Wylogowano pomyślnie", { icon: '👋' });
-  };
-
-  // --- STAN: KOSZYK ---
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('myCart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
-
-  useEffect(() => {
     localStorage.setItem('myCart', JSON.stringify(cart));
-  }, [cart]);
+    localStorage.setItem('userFavs', JSON.stringify(favorites));
+  }, [theme, cart, favorites]);
 
-  const addToCart = (product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevCart, { ...product, quantity: 1 }];
-    });
-    toast.success(`Dodano ${product.name} do koszyka!`);
-  };
+  const handleLogout = () => signOut(auth);
+  const addOrder = async (order) => await addDoc(collection(db, "orders"), order);
 
-  const updateQuantity = (id, action) => {
-    setCart((prevCart) => {
-      return prevCart.map((item) => {
-        if (item.id === id) {
-          if (action === 'increment') return { ...item, quantity: item.quantity + 1 };
-          if (action === 'decrement' && item.quantity > 1) return { ...item, quantity: item.quantity - 1 };
-        }
-        return item;
-      });
-    });
-  };
-
-  const removeItem = (id) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
-    toast.error("Usunięto z koszyka");
-  };
-
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-
-  // --- RENDEROWANIE ---
   return (
     <Router>
       <div className="App">
-        {/* Powiadomienia TOAST */}
-        <Toaster 
-          position="bottom-right" 
-          toastOptions={{
-            style: {
-              background: 'var(--bg-card)',
-              color: 'var(--text-main)',
-              border: '1px solid var(--border)'
-            }
-          }} 
-        />
-
-        {/* Nawigacja górna */}
+        <Toaster position="bottom-right" />
         <Navbar 
-          cartCount={totalItems} 
+          cartCount={cart.reduce((t, i) => t + i.quantity, 0)} 
           user={user} 
           onLogout={handleLogout} 
-          toggleTheme={toggleTheme}
+          toggleTheme={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
           currentTheme={theme}
         />
-
-        {/* Treść strony */}
-        <main style={{ minHeight: '80vh' }}>
+        <main>
           <Routes>
-            <Route path="/" element={<Home onAddToCart={addToCart} />} />
-            <Route 
-              path="/cart" 
-              element={
-                <Cart 
-                  cartItems={cart} 
-                  onUpdateQuantity={updateQuantity} 
-                  onRemove={removeItem} 
-                />
-              } 
-            />
-            <Route 
-              path="/product/:id" 
-              element={<ProductDetails onAddToCart={addToCart} />} 
-            />
+            <Route path="/" element={<Home onAddToCart={(p) => setCart([...cart, {...p, quantity: 1}])} favorites={favorites} onToggleFav={(id) => setFavorites(f => f.includes(id) ? f.filter(x => x !== id) : [...f, id])} />} />
+            <Route path="/cart" element={<Cart cartItems={cart} onUpdateQuantity={(id, a) => setCart(cart.map(i => i.id === id ? {...i, quantity: a === 'increment' ? i.quantity+1 : i.quantity-1} : i))} onRemove={(id) => setCart(cart.filter(i => i.id !== id))} />} />
+            <Route path="/checkout" element={<Checkout cartItems={cart} totalPrice={cart.reduce((t, i) => t + i.price * i.quantity, 0)} clearCart={() => setCart([])} user={user} addOrder={addOrder} />} />
+            <Route path="/product/:id" element={<ProductDetails onAddToCart={(p) => setCart([...cart, {...p, quantity: 1}])} favorites={favorites} onToggleFav={(id) => setFavorites(f => f.includes(id) ? f.filter(x => x !== id) : [...f, id])} />} />
+            <Route path="/login" element={<Login user={user} orders={orders} favorites={favorites} />} />
             <Route path="/about" element={<About />} />
-            <Route 
-              path="/login" 
-              element={<Login setUser={setUser} user={user} />} 
-            />
           </Routes>
         </main>
-
-        {/* Stopka dolna */}
         <Footer />
       </div>
     </Router>
