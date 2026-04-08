@@ -2,13 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Cart({ cartItems, onUpdateQuantity, onRemove }) {
-  // Obliczanie sumy całkowitej
+  // Obliczanie sumy lokalnie dla widoku koszyka
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity, 
     0
   );
 
-  // Widok, gdy koszyk jest pusty
   if (cartItems.length === 0) {
     return (
       <div style={{ 
@@ -37,8 +36,14 @@ function Cart({ cartItems, onUpdateQuantity, onRemove }) {
       
       <div className="cart-container">
         {cartItems.map((item) => (
-          <div key={item.id} className="cart-row">
-            {/* Zdjęcie i Nazwa */}
+          <div key={item.id} className="cart-row" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '20px 0',
+            borderBottom: '1px solid var(--border)'
+          }}>
+            {/* Produkt */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: '2' }}>
               <img 
                 src={item.image} 
@@ -52,26 +57,16 @@ function Cart({ cartItems, onUpdateQuantity, onRemove }) {
               </div>
             </div>
 
-            {/* Selektor Ilości (Nowy Design) */}
+            {/* Ilość */}
             <div style={{ flex: '1', display: 'flex', justifyContent: 'center' }}>
               <div className="quantity-controls">
-                <button 
-                  className="qty-btn" 
-                  onClick={() => onUpdateQuantity(item.id, 'decrement')}
-                >
-                  −
-                </button>
+                <button className="qty-btn" onClick={() => onUpdateQuantity(item.id, 'decrement')}>−</button>
                 <span className="qty-number">{item.quantity}</span>
-                <button 
-                  className="qty-btn" 
-                  onClick={() => onUpdateQuantity(item.id, 'increment')}
-                >
-                  +
-                </button>
+                <button className="qty-btn" onClick={() => onUpdateQuantity(item.id, 'increment')}>+</button>
               </div>
             </div>
 
-            {/* Suma za dany produkt */}
+            {/* Cena całkowita pozycji */}
             <div style={{ flex: '1', textAlign: 'right' }}>
               <p style={{ fontWeight: '800', fontSize: '1.2rem', color: 'var(--accent)' }}>
                 {(item.price * item.quantity).toFixed(2)} PLN
@@ -81,7 +76,7 @@ function Cart({ cartItems, onUpdateQuantity, onRemove }) {
         ))}
       </div>
 
-      {/* Podsumowanie Koszyka */}
+      {/* Podsumowanie */}
       <div style={{ 
         marginTop: '40px', 
         padding: '30px', 
@@ -106,9 +101,17 @@ function Cart({ cartItems, onUpdateQuantity, onRemove }) {
           }}>
             Kontynuuj zakupy
           </Link>
-          <button className="add-btn" style={{ maxWidth: '300px', padding: '15px 40px' }}>
+          
+          {/* PRZYCISK DO CHECKOUT */}
+          <Link to="/checkout" className="add-btn" style={{ 
+            maxWidth: '300px', 
+            padding: '15px 40px', 
+            textDecoration: 'none', 
+            textAlign: 'center',
+            display: 'inline-block'
+          }}>
             Przejdź do kasy
-          </button>
+          </Link>
         </div>
       </div>
     </div>
